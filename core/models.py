@@ -11,13 +11,7 @@ class Substance(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -31,24 +25,20 @@ class Nature(models.Model):
 
 
 class Symptom(models.Model):
-    category = models.OneToOneField(
-        Category, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    sub_category = models.OneToOneField(
-        SubCategory, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    name = models.CharField(max_length=255)
+    sub_category = models.ManyToManyField(SubCategory, null=True, blank=True)
     nature = models.ForeignKey(Nature, on_delete=models.SET_NULL, null=True, blank=True)
     weight = models.IntegerField()
     substance = models.ManyToManyField(Substance)
 
     def __str__(self):
-        return self.category.name
+        return self.name
 
 
 class Patient(models.Model):
     name = models.CharField(max_length=100)
-    mother_name = models.CharField(max_length=100)
-    born_date = models.DateField()
+    mothers_name = models.CharField(max_length=100)
+    birth_date = models.DateField()
     symptoms = models.ManyToManyField(Symptom)
 
     def __str__(self):

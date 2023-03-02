@@ -3,10 +3,7 @@ from rest_framework import serializers
 
 class RetrieverSubCategorySerializer(serializers.Serializer):
     name = serializers.CharField()
-
-
-class RetrieverCategorySerializer(serializers.Serializer):
-    name = serializers.CharField()
+    description = serializers.CharField()
 
 
 class RetrieverSubstanceSerializer(serializers.Serializer):
@@ -16,8 +13,10 @@ class RetrieverSubstanceSerializer(serializers.Serializer):
 
 class SymptomSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=True)
-    category = RetrieverCategorySerializer(required=False)
-    sub_category = RetrieverSubCategorySerializer(required=False)
+    name = serializers.CharField(required=False)
+    sub_category = serializers.ListField(
+        child=RetrieverSubCategorySerializer(), required=False
+    )
     nature = serializers.CharField(required=False)
     weight = serializers.IntegerField(required=False)
     substances = serializers.ListField(

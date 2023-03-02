@@ -8,9 +8,16 @@ class SymptomRepository:
 
         return {
             "id": symptom.id,
+            "name": symptom.name,
             "nature": symptom.nature.name,
-            "category": {"name": symptom.category.name},
-            "sub_category": {"name": symptom.sub_category.name},
+            "category": symptom.name,
+            "sub_category": [
+                {
+                    "name": sub_category.name,
+                    "description": sub_category.description,
+                }
+                for sub_category in symptom.sub_category.all()
+            ],
             "weight": symptom.weight,
             "substances": [
                 {"name": substance.name, "abbreviation": substance.abbreviation}
@@ -26,7 +33,7 @@ class SymptomRepository:
     @transaction.atomic
     def create(self, data):
         Symptom.objects.create(
-            category=data["category"],
+            name=data["name"],
             sub_category=data["sub_category"],
             nature=data["nature"],
             weight=data["weight"],
