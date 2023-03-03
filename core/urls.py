@@ -6,4 +6,10 @@ urlpatterns = [
     path("symptoms", views.SymptomsAPIView.as_view(), name="symptoms"),
     path("substances", views.SubstancesAPIView.as_view(), name="substances"),
     path("substances/<int:id>", views.SubstanceAPIView.as_view(), name="substance"),
+    path("sub-categories", views.SubCategoriesAPIView.as_view(), name="sub-categories"),
+    path(
+        "sub-categories/<int:id>",
+        views.SubCategoryAPIView.as_view(),
+        name="sub-category",
+    ),
 ]
