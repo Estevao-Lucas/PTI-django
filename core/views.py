@@ -3,13 +3,22 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
-from core.serializers import SymptomSerializer, RetrieverSymptomSerializer
+from core.serializers import (
+    SymptomSerializer,
+    RetrieverSymptomSerializer,
+    RetrieverSubstanceSerializer,
+)
 from core.use_cases import (
     DetailSymptomUseCase,
     DeleteSymptomUseCase,
     UpdateSymptomUseCase,
-    ListSymptomUseCase,
     CreateSymptomUseCase,
+    ListSymptomUseCase,
+    CreateSubstanceUseCase,
+    DetailSubstanceUseCase,
+    DeleteSubstanceUseCase,
+    UpdateSubstanceUseCase,
+    ListSubstanceUseCase,
 )
 
 # Create your views here.
@@ -78,7 +87,6 @@ class SymptomAPIView(APIView):
         serializer = self.serializer_class(data=body, context=context)
 
         if not serializer.is_valid():
-            print(serializer.data)
             return Response(
                 {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -136,4 +144,112 @@ class SymptomsAPIView(APIView, CustomPagination):
                 {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
             )
         response = self.create_symptom_use_case.execute(serializer.data)
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class SubstanceAPIView(APIView):
+    serializer_class = RetrieverSubstanceSerializer
+    detail_use_case = DetailSubstanceUseCase()
+    delete_use_case = DeleteSubstanceUseCase()
+    update_use_case = UpdateSubstanceUseCase()
+
+    def __init__(
+        self,
+        detail_use_case=None,
+        delete_use_case=None,
+        update_use_case=None,
+        serializer_class=None,
+    ):
+        self.detail_use_case = detail_use_case or self.detail_use_case
+        self.delete_use_case = delete_use_case or self.delete_use_case
+        self.update_use_case = update_use_case or self.update_use_case
+        self.serializer_class = serializer_class or self.serializer_class
+
+    def get(self, request, id):
+        body = {**request.GET.dict(), "id": id}
+        context = {"request": request}
+        serializer = self.serializer_class(data=body, context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(
+            self.detail_use_case.execute(serializer.data), context=context
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, id):
+        body = {**request.GET.dict(), "id": id}
+        context = {"request": request}
+        serializer = self.serializer_class(data=body, context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response = self.delete_use_case.execute(serializer.data)
+
+        return Response(response, status=status.HTTP_200_OK)
+
+    def put(self, request, id):
+        body = request.data.copy()
+        body["id"] = id
+        context = {"request": request}
+        serializer = self.serializer_class(data=body, context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(
+            self.update_use_case.execute(serializer.data), context=context
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SubstancesAPIView(APIView, CustomPagination):
+    serializer_class = RetrieverSubstanceSerializer
+    use_case = ListSubstanceUseCase()
+    create_substance_use_case = CreateSubstanceUseCase()
+
+    def __init__(
+        self, serializer_class=None, use_case=None, create_substance_use_case=None
+    ):
+        self.serializer_class = serializer_class or self.serializer_class
+        self.use_case = use_case or self.use_case
+        self.create_substance_use_case = (
+            create_substance_use_case or self.create_substance_use_case
+        )
+
+    def get(self, request):
+        context = {"request": request}
+        serializer = self.serializer_class(data=request.GET.dict(), context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response = self.serializer_class(
+            self.paginate_queryset(self.use_case.execute(), request, view=self),
+            many=True,
+            context=context,
+        ).data
+
+        return self.get_paginated_response(response)
+
+    def post(self, request):
+        context = {"request": request}
+        serializer = self.serializer_class(data=request.data, context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+        response = self.create_substance_use_case.execute(serializer.data)
         return Response(response, status=status.HTTP_200_OK)
