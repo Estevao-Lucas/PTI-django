@@ -2,13 +2,15 @@ from rest_framework import serializers
 
 
 class RetrieverSubCategorySerializer(serializers.Serializer):
-    name = serializers.CharField()
-    description = serializers.CharField()
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
 
 
 class RetrieverSubstanceSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    abbreviation = serializers.CharField()
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    abbreviation = serializers.CharField(required=False)
 
 
 class RetrieverSymptomSerializer(serializers.Serializer):

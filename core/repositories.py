@@ -3,6 +3,33 @@ from django.db import transaction
 
 
 class SymptomRepository:
+    def _get_substance_or_subcategory(self, data, symptom, is_update=None):
+        for key, value in data.items():
+            if key == "sub_category":
+                for sub_category in value:
+                    _sub_category = SubCategory.objects.get_or_create(
+                        id=sub_category["id"],
+                        defaults={
+                            "name": sub_category.get("name", ""),
+                            "description": sub_category.get("description", ""),
+                        },
+                    )
+                    symptom.sub_category.add(_sub_category[0])
+            elif key == "substances":
+                for substance in value:
+                    _substance = Substance.objects.get_or_create(
+                        id=substance["id"],
+                        defaults={
+                            "name": substance["name"],
+                            "abbreviation": substance["abbreviation"],
+                        },
+                    )
+                    symptom.substance.add(_substance[0])
+            else:
+                if is_update:
+                    for key, value in data.items():
+                        setattr(symptom, key, value)
+
     def get(self, id):
         symptom = Symptom.objects.get(id=id)
 
@@ -13,6 +40,7 @@ class SymptomRepository:
             "category": symptom.name,
             "sub_category": [
                 {
+                    "id": sub_category.id,
                     "name": sub_category.name,
                     "description": sub_category.description,
                 }
@@ -20,7 +48,11 @@ class SymptomRepository:
             ],
             "weight": symptom.weight,
             "substances": [
-                {"name": substance.name, "abbreviation": substance.abbreviation}
+                {
+                    "id": substance.id,
+                    "name": substance.name,
+                    "abbreviation": substance.abbreviation,
+                }
                 for substance in symptom.substance.all()
             ],
         }
@@ -39,21 +71,7 @@ class SymptomRepository:
             weight=data["weight"],
         )
 
-        for key, value in data.items():
-            if key == "sub_category":
-                for sub_catagory in value:
-                    sub_category = SubCategory.objects.get_or_create(
-                        name=sub_catagory["name"],
-                        defaults={"description": sub_catagory["description"]},
-                    )
-                    symptom.sub_category.add(sub_category[0])
-            elif key == "substances":
-                for substance in value:
-                    _substance = Substance.objects.get_or_create(
-                        name=substance["name"],
-                        defaults={"abbreviation": substance["abbreviation"]},
-                    )
-                    symptom.substance.add(_substance[0])
+        self._get_substance_or_subcategory(data, symptom)
 
         return {"message": "Symptom created successfully"}
 
@@ -65,23 +83,8 @@ class SymptomRepository:
         except:
             return {"message": "Symptom not found"}
         else:
-            for key, value in data.items():
-                if key == "sub_category":
-                    for sub_catagory in value:
-                        sub_category = SubCategory.objects.get_or_create(
-                            name=sub_catagory["name"],
-                            defaults={"description": sub_catagory["description"]},
-                        )
-                        symptom.sub_category.add(sub_category[0])
-                elif key == "substances":
-                    for substance in value:
-                        _substance = Substance.objects.get_or_create(
-                            name=substance["name"],
-                            defaults={"abbreviation": substance["abbreviation"]},
-                        )
-                        symptom.substance.add(_substance[0])
-                else:
-                    setattr(symptom, key, value)
+            self._get_substance_or_subcategory(data, symptom, is_update=True)
+
             symptom.save()
             return {
                 "id": symptom.id,
@@ -90,6 +93,7 @@ class SymptomRepository:
                 "category": symptom.name,
                 "sub_category": [
                     {
+                        "id": sub_category.id,
                         "name": sub_category.name,
                         "description": sub_category.description,
                     }
@@ -97,7 +101,11 @@ class SymptomRepository:
                 ],
                 "weight": symptom.weight,
                 "substances": [
-                    {"name": substance.name, "abbreviation": substance.abbreviation}
+                    {
+                        "id": substance.id,
+                        "name": substance.name,
+                        "abbreviation": substance.abbreviation,
+                    }
                     for substance in symptom.substance.all()
                 ],
             }
