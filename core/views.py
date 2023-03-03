@@ -10,7 +10,7 @@ from core.use_cases import (
 )
 
 # Create your views here.
-class SymptomsAPIView(APIView):
+class SymptomAPIView(APIView):
     permission_classes = (AllowAny,)
     detail_use_case = DetailSymptomUseCase()
     delete_use_case = DeleteSymptomUseCase()
