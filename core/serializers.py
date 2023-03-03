@@ -12,7 +12,7 @@ class RetrieverSubstanceSerializer(serializers.Serializer):
 
 
 class SymptomSerializer(serializers.Serializer):
-    id = serializers.IntegerField(required=True)
+    id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     sub_category = serializers.ListField(
         child=RetrieverSubCategorySerializer(), required=False

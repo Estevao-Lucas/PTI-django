@@ -17,17 +17,10 @@ class SubCategory(models.Model):
         return self.name
 
 
-class Nature(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
 class Symptom(models.Model):
     name = models.CharField(max_length=255)
     sub_category = models.ManyToManyField(SubCategory, null=True, blank=True)
-    nature = models.ForeignKey(Nature, on_delete=models.SET_NULL, null=True, blank=True)
+    nature = models.CharField(max_length=100)
     weight = models.IntegerField()
     substance = models.ManyToManyField(Substance)
 
