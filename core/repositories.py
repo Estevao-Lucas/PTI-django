@@ -33,18 +33,27 @@ class SymptomRepository:
 
     @transaction.atomic
     def create(self, data):
-        sub_category = SubCategory.objects.get_or_create(
-            name=data["sub_category"]["name"],
-            defaults={"description": data["sub_category"]["description"]},
-        )
-
-        Symptom.objects.create(
+        symptom = Symptom.objects.create(
             name=data["name"],
-            sub_category=sub_category[0],
             nature=data["nature"],
             weight=data["weight"],
-            substance=data["substances"],
         )
+
+        for key, value in data.items():
+            if key == "sub_category":
+                for sub_catagory in value:
+                    sub_category = SubCategory.objects.get_or_create(
+                        name=sub_catagory["name"],
+                        defaults={"description": sub_catagory["description"]},
+                    )
+                    symptom.sub_category.add(sub_category[0])
+            elif key == "substances":
+                for substance in value:
+                    _substance = Substance.objects.get_or_create(
+                        name=substance["name"],
+                        defaults={"abbreviation": substance["abbreviation"]},
+                    )
+                    symptom.substance.add(_substance[0])
 
         return {"message": "Symptom created successfully"}
 
@@ -92,3 +101,7 @@ class SymptomRepository:
                     for substance in symptom.substance.all()
                 ],
             }
+
+    @transaction.atomic
+    def list(self):
+        return list(Symptom.objects.all().values("id", "name", "nature"))

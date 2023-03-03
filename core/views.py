@@ -1,21 +1,31 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
-from core.serializers import SymptomSerializer
+from core.serializers import SymptomSerializer, RetrieverSymptomSerializer
 from core.use_cases import (
     DetailSymptomUseCase,
     DeleteSymptomUseCase,
     UpdateSymptomUseCase,
+    ListSymptomUseCase,
+    CreateSymptomUseCase,
 )
 
 # Create your views here.
+
+
+class CustomPagination(LimitOffsetPagination):
+    default_limit = 10
+    page_query_param = "page"
+
+
 class SymptomAPIView(APIView):
     permission_classes = (AllowAny,)
     detail_use_case = DetailSymptomUseCase()
     delete_use_case = DeleteSymptomUseCase()
     update_use_case = UpdateSymptomUseCase()
-    serializer_class = SymptomSerializer
+    serializer_class = RetrieverSymptomSerializer
 
     def __init__(
         self,
@@ -78,3 +88,52 @@ class SymptomAPIView(APIView):
         )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SymptomsAPIView(APIView, CustomPagination):
+    permission_classes = (AllowAny,)
+    serializer_class = RetrieverSymptomSerializer
+    use_case = ListSymptomUseCase()
+    create_symptom_use_case = CreateSymptomUseCase()
+
+    def __init__(
+        self,
+        serializer=None,
+        permission=None,
+        use_case=None,
+        create_symptom_use_case=None,
+    ):
+        self.serializer_class = serializer or self.serializer_class
+        self.permission = permission or self.permission_classes
+        self.use_case = use_case or self.use_case
+        self.create_symptom_use_case = (
+            create_symptom_use_case or self.create_symptom_use_case
+        )
+
+    def get(self, request):
+        context = {"request": request}
+        serializer = self.serializer_class(data=request.GET.dict(), context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response = SymptomSerializer(
+            self.paginate_queryset(self.use_case.execute(), request, view=self),
+            many=True,
+            context=context,
+        ).data
+
+        return self.get_paginated_response(response)
+
+    def post(self, request):
+        context = {"request": request}
+        serializer = self.serializer_class(data=request.data, context=context)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+        response = self.create_symptom_use_case.execute(serializer.data)
+        return Response(response, status=status.HTTP_200_OK)

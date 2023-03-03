@@ -11,7 +11,7 @@ class RetrieverSubstanceSerializer(serializers.Serializer):
     abbreviation = serializers.CharField()
 
 
-class SymptomSerializer(serializers.Serializer):
+class RetrieverSymptomSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     sub_category = serializers.ListField(
@@ -22,3 +22,9 @@ class SymptomSerializer(serializers.Serializer):
     substances = serializers.ListField(
         child=RetrieverSubstanceSerializer(), required=False
     )
+
+
+class SymptomSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    nature = serializers.CharField(required=False)
