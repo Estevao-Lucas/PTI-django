@@ -1,4 +1,4 @@
-from core.models import Symptom, SubCategory, Substance
+from core.models import Symptom, SubCategory, Substance, SubCategory
 from django.db import transaction
 
 
@@ -129,6 +129,7 @@ class SubstanceRepository:
     def list(self):
         return list(Substance.objects.all().values("id", "name", "abbreviation"))
 
+    @transaction.atomic
     def update(self, data):
         id = data.pop("id")
         substance = Substance.objects.get(id=id)
@@ -152,3 +153,42 @@ class SubstanceRepository:
         Substance.objects.create(name=data["name"], abbreviation=data["abbreviation"])
 
         return {"message": "Substance created successfully"}
+
+
+class SubCategoryRepository:
+    def get(self, id):
+        sub_category = SubCategory.objects.get(id=id)
+
+        return {
+            "id": sub_category.id,
+            "name": sub_category.name,
+            "description": sub_category.description,
+        }
+
+    def list(self):
+        return list(SubCategory.objects.all().values("id", "name", "description"))
+
+    @transaction.atomic
+    def update(self, data):
+        id = data.pop("id")
+        sub_category = SubCategory.objects.get(id=id)
+        for key, value in data.items():
+            setattr(sub_category, key, value)
+
+        return {
+            "id": sub_category.id,
+            "name": sub_category.name,
+            "description": sub_category.description,
+        }
+
+    @transaction.atomic
+    def delete(self, data):
+        sub_category = SubCategory.objects.get(id=data["id"])
+        sub_category.delete()
+        return {"message": "SubCategory has been deleted successfully"}
+
+    @transaction.atomic
+    def create(self, data):
+        SubCategory.objects.create(name=data["name"], description=data["description"])
+
+        return {"message": "SubCategory created successfully"}
