@@ -144,7 +144,7 @@ class SubstanceRepository:
 
     @transaction.atomic
     def delete(self, data):
-        substance = Substance.objects.get(id=data["id"])
+        substance = Substance.objects.get(id=data)
         substance.delete()
         return {"message": "Substance has been deleted successfully"}
 
@@ -183,7 +183,7 @@ class SubCategoryRepository:
 
     @transaction.atomic
     def delete(self, data):
-        sub_category = SubCategory.objects.get(id=data["id"])
+        sub_category = SubCategory.objects.get(id=data)
         sub_category.delete()
         return {"message": "SubCategory has been deleted successfully"}
 
