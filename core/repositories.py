@@ -200,7 +200,6 @@ class PatientRepository:
 
     def get(self, data):
         patient = Patient.objects.get(id=data)
-
         return {
             "id": patient.id,
             "name": patient.name,
@@ -214,11 +213,11 @@ class PatientRepository:
                     "weight": symptom.weight,
                     "sub_category": [
                         {
-                            "id": sub_category.id,
-                            "name": sub_category.name,
-                            "description": sub_category.description,
+                            "id": sub_category.get("id"),
+                            "name": sub_category.get("name"),
+                            "description": sub_category.get("description"),
                         }
-                        for sub_category in symptom.sub_category.all()
+                        for sub_category in symptom.sub_category.all().values()
                     ],
                 }
                 for symptom in patient.symptoms.all()
@@ -269,8 +268,10 @@ class PatientRepository:
             mothers_name=data["mothers_name"],
             birth_date=data["birth_date"],
         )
+        symptoms = data.pop("symptoms", None)
 
-        for symptom in data["symptoms"]:
-            patient.symptoms.add(Symptom.objects.get(id=symptom))
+        if symptoms:
+            for symptom in symptoms:
+                patient.symptoms.add(Symptom.objects.get(id=symptom))
 
         return {"message": "Patient created successfully"}

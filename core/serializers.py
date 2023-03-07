@@ -30,3 +30,17 @@ class SymptomSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     nature = serializers.CharField(required=False)
+
+
+class RetrieverPatientSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    mothers_name = serializers.CharField(required=False)
+    birth_date = serializers.DateField(required=False)
+    symptoms = serializers.ListField(child=RetrieverSymptomSerializer(), required=False)
+
+
+class PatientSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    mothers_name = serializers.CharField(required=False)

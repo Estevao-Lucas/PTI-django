@@ -1,10 +1,11 @@
 from core.mixins import MixinDetailAPIView, MixinCreateAndListAPIView
-
 from core.serializers import (
     SymptomSerializer,
     RetrieverSymptomSerializer,
     RetrieverSubstanceSerializer,
     RetrieverSubCategorySerializer,
+    RetrieverPatientSerializer,
+    PatientSerializer,
 )
 from core.use_cases import (
     DetailSymptomUseCase,
@@ -22,6 +23,11 @@ from core.use_cases import (
     UpdateSubCategoryUseCase,
     CreateSubCategoryUseCase,
     ListSubCategoryUseCase,
+    DeletePatientUseCase,
+    DetailPatientUseCase,
+    CreatePatientUseCase,
+    ListPatientUseCase,
+    UpdatePatientUseCase,
 )
 
 # Create your views here.
@@ -67,3 +73,17 @@ class SubCategoriesAPIView(MixinCreateAndListAPIView):
     retriever_serializer_class = RetrieverSubCategorySerializer
     create_instance_use_case = CreateSubCategoryUseCase()
     use_case = ListSubCategoryUseCase()
+
+
+class PatientAPIView(MixinDetailAPIView):
+    serializer_class = RetrieverPatientSerializer
+    detail_use_case = DetailPatientUseCase()
+    delete_use_case = DeletePatientUseCase()
+    update_use_case = UpdatePatientUseCase()
+
+
+class PatientsAPIView(MixinCreateAndListAPIView):
+    serializer_class = RetrieverPatientSerializer
+    retriever_serializer_class = PatientSerializer
+    create_instance_use_case = CreatePatientUseCase()
+    use_case = ListPatientUseCase()

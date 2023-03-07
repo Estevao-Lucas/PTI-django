@@ -12,4 +12,6 @@ urlpatterns = [
         views.SubCategoryAPIView.as_view(),
         name="sub-category",
     ),
+    path("patients", views.PatientsAPIView.as_view(), name="patients"),
+    path("patients/<int:id>", views.PatientAPIView.as_view(), name="patient"),
 ]
