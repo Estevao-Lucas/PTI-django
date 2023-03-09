@@ -1,17 +1,20 @@
-from django.urls import path, include
-from core import views
+from django.urls import path
+from core.app.api.views.patient_view import PatientAPIView, PatientsAPIView
+from core.app.api.views.subcategory_view import SubCategoriesAPIView, SubCategoryAPIView
+from core.app.api.views.symptom_view import SymptomAPIView, SymptomsAPIView
+from core.app.api.views.substance_view import SubstanceAPIView, SubstancesAPIView
 
 urlpatterns = [
-    path("symptoms/<int:id>", views.SymptomAPIView.as_view(), name="symptom"),
-    path("symptoms", views.SymptomsAPIView.as_view(), name="symptoms"),
-    path("substances", views.SubstancesAPIView.as_view(), name="substances"),
-    path("substances/<int:id>", views.SubstanceAPIView.as_view(), name="substance"),
-    path("sub-categories", views.SubCategoriesAPIView.as_view(), name="sub-categories"),
+    path("symptoms/<int:id>", SymptomAPIView.as_view(), name="symptom"),
+    path("symptoms", SymptomsAPIView.as_view(), name="symptoms"),
+    path("substances", SubstancesAPIView.as_view(), name="substances"),
+    path("substances/<int:id>", SubstanceAPIView.as_view(), name="substance"),
+    path("sub-categories", SubCategoriesAPIView.as_view(), name="sub-categories"),
     path(
         "sub-categories/<int:id>",
-        views.SubCategoryAPIView.as_view(),
+        SubCategoryAPIView.as_view(),
         name="sub-category",
     ),
-    path("patients", views.PatientsAPIView.as_view(), name="patients"),
-    path("patients/<int:id>", views.PatientAPIView.as_view(), name="patient"),
+    path("patients", PatientsAPIView.as_view(), name="patients"),
+    path("patients/<int:id>", PatientAPIView.as_view(), name="patient"),
 ]
