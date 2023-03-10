@@ -31,8 +31,7 @@ class SubCategoryRepository(ABCRepository):
 
     @transaction.atomic
     def delete(self, data):
-        sub_category = SubCategory.objects.get(id=data)
-        sub_category.delete()
+        SubCategory.objects.filter(id=data).delete()
         return {"message": "SubCategory has been deleted successfully"}
 
     @transaction.atomic
