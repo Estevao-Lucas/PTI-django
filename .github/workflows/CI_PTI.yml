@@ -35,7 +35,7 @@ jobs:
       run: docker-compose up -d
       
     - name: Teste
-      run: docker exec -i ptii_web pytest
+      run: docker exec -i ptii_web pytest -v
       
   lint:
     needs: test
