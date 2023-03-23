@@ -19,17 +19,25 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
-INSTALLED_APPS = [
+
+THIRD_APPS = []
+
+APPS = [
+    "core",
+]
+
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "core",
-    "rest_framework",
     "corsheaders",
+    "rest_framework",
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
