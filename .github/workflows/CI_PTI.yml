@@ -30,4 +30,4 @@ jobs:
       run: docker-compose up -d
       
     - name: Teste
-      run: docker exec -it ptii_web pytest core/tests/integration/data/repositories/test_subcategory.py 
+      run: docker exec -i ptii_web pytest core/tests/integration/data/repositories/test_subcategory.py 
