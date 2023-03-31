@@ -32,12 +32,23 @@ class SymptomSerializer(serializers.Serializer):
     nature = serializers.CharField(required=False)
 
 
+class RetrieverSubstancePunctuationSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    traeted_symptoms = serializers.ListField(
+        child=serializers.CharField(), required=False
+    )
+    total_punctuation = serializers.IntegerField(required=False)
+
+
 class RetrieverPatientSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     mothers_name = serializers.CharField(required=False)
     birth_date = serializers.DateField(required=False)
     symptoms = serializers.ListField(child=RetrieverSymptomSerializer(), required=False)
+    substance_punctuation = serializers.ListField(
+        child=RetrieverSubstancePunctuationSerializer(), required=False
+    )
 
 
 class PatientSerializer(serializers.Serializer):

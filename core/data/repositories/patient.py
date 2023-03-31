@@ -1,4 +1,4 @@
-from core.models import Symptom, Patient
+from core.models import Symptom, Patient, Substance
 from django.db import transaction
 from core.domain.abstract_repositories import ABCRepository
 
@@ -31,7 +31,33 @@ class PatientRepository(ABCRepository):
                 }
                 for symptom in patient.symptoms.all()
             ],
+            "substance_punctuation": self._get_punctuation(patient),
         }
+
+    def _get_punctuation(self, patient):
+        symptoms = patient.symptoms.all()
+        substances = set(Substance.objects.filter(symptom__in=symptoms))
+
+        result = [
+            {
+                "name": substance.name,
+                "traeted_symptoms": list(
+                    set(
+                        symptoms.filter(substance=substance).values_list(
+                            "name", flat=True
+                        )
+                    )
+                ),
+                "total_punctuation": sum(
+                    symptoms.filter(substance=substance).values_list(
+                        "weight", flat=True
+                    )
+                ),
+            }
+            for substance in substances
+        ]
+
+        return result
 
     def update(self, data):
         patient = Patient.objects.get(id=data["id"])
