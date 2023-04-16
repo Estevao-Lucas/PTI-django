@@ -39,14 +39,13 @@ class SymptomRepository(ABCRepository):
             "name": symptom.name,
             "nature": symptom.nature,
             "category": symptom.name,
-            "sub_category": [
-                {
-                    "id": sub_category.id,
-                    "name": sub_category.name,
-                    "description": sub_category.description,
-                }
-                for sub_category in symptom.sub_category.all()
-            ],
+            "sub_category": {
+                "id": symptom.sub_category.id,
+                "name": symptom.sub_category.name,
+                "description": symptom.sub_category.description,
+            }
+            if symptom.sub_category
+            else {},
             "weight": symptom.weight,
             "substances": [
                 {
@@ -92,14 +91,11 @@ class SymptomRepository(ABCRepository):
                 "name": symptom.name,
                 "nature": symptom.nature,
                 "category": symptom.name,
-                "sub_category": [
-                    {
-                        "id": sub_category.id,
-                        "name": sub_category.name,
-                        "description": sub_category.description,
-                    }
-                    for sub_category in symptom.sub_category.all()
-                ],
+                "sub_category": {
+                    "id": symptom.sub_category.id,
+                    "name": symptom.sub_category.name,
+                    "description": symptom.sub_category.description,
+                },
                 "weight": symptom.weight,
                 "substances": [
                     {
@@ -113,4 +109,15 @@ class SymptomRepository(ABCRepository):
 
     @transaction.atomic
     def list(self):
-        return list(Symptom.objects.all().values("id", "name", "nature"))
+        def _data_structure(symptom):
+            return {
+                "id": symptom.id,
+                "name": symptom.name,
+                "nature": symptom.nature,
+                "weight": symptom.weight,
+                "sub_category": symptom.sub_category.name
+                if symptom.sub_category
+                else None,
+            }
+
+        return [_data_structure(symptom) for symptom in Symptom.objects.all()]
