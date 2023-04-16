@@ -45,7 +45,7 @@ class SymptomRepository(ABCRepository):
                 "description": symptom.sub_category.description,
             }
             if symptom.sub_category
-            else {},
+            else None,
             "weight": symptom.weight,
             "substances": [
                 {
