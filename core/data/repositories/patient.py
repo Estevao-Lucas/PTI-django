@@ -67,6 +67,7 @@ class PatientRepository(ABCRepository):
                 patient.symptoms.add(Symptom.objects.get(id=symptom["id"]))
         for key, value in data.items():
             setattr(patient, key, value)
+        patient.save()
 
         return {
             "id": patient.id,

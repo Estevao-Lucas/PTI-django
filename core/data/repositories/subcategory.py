@@ -22,6 +22,7 @@ class SubCategoryRepository(ABCRepository):
         sub_category = SubCategory.objects.get(id=id)
         for key, value in data.items():
             setattr(sub_category, key, value)
+        sub_category.save()
 
         return {
             "id": sub_category.id,
