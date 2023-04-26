@@ -104,9 +104,8 @@ class PatientRepository(ABCRepository):
             birth_date=data["birth_date"],
         )
         symptoms = data.pop("symptoms", None)
-
         if symptoms:
             for symptom in symptoms:
-                patient.symptoms.add(Symptom.objects.get(id=symptom))
+                patient.symptoms.add(Symptom.objects.get(id=symptom["id"]))
 
         return {"message": "Patient created successfully"}
