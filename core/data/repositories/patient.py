@@ -59,6 +59,7 @@ class PatientRepository(ABCRepository):
 
         return result
 
+    @transaction.atomic
     def update(self, data):
         patient = Patient.objects.get(id=data["id"])
         symptoms = data.pop("symptoms", None)
@@ -97,6 +98,7 @@ class PatientRepository(ABCRepository):
         Patient.objects.get(id=data).delete()
         return {"message": "Patient has been deleted successfully"}
 
+    @transaction.atomic
     def create(self, data):
         patient = Patient.objects.create(
             name=data["name"],
