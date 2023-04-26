@@ -19,7 +19,9 @@ class SubCategory(models.Model):
 
 class Symptom(models.Model):
     name = models.CharField(max_length=255)
-    sub_category = models.ManyToManyField(SubCategory, null=True, blank=True)
+    sub_category = models.OneToOneField(
+        SubCategory, null=True, blank=True, on_delete=models.CASCADE
+    )
     nature = models.CharField(max_length=100)
     weight = models.IntegerField()
     substance = models.ManyToManyField(Substance)

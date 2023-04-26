@@ -16,9 +16,7 @@ class RetrieverSubstanceSerializer(serializers.Serializer):
 class RetrieverSymptomSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
-    sub_category = serializers.ListField(
-        child=RetrieverSubCategorySerializer(), required=False
-    )
+    sub_category = RetrieverSubCategorySerializer(required=False)
     nature = serializers.CharField(required=False)
     weight = serializers.IntegerField(required=False)
     substances = serializers.ListField(
@@ -30,6 +28,8 @@ class SymptomSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     nature = serializers.CharField(required=False)
+    weight = serializers.IntegerField(required=False)
+    sub_category = serializers.CharField(required=False)
 
 
 class RetrieverSubstancePunctuationSerializer(serializers.Serializer):

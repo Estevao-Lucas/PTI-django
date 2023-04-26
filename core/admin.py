@@ -3,7 +3,7 @@ from core.models import Symptom, SubCategory, Substance, Patient
 
 
 class SymptomAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "nature", "weight")
+    list_display = ("id", "name", "sub_category", "nature", "weight")
 
 
 class SubCategoryAdmin(admin.ModelAdmin):

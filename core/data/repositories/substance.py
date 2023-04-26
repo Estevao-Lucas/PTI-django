@@ -23,7 +23,7 @@ class SubstanceRepository(ABCRepository):
         substance = Substance.objects.get(id=id)
         for key, value in data.items():
             setattr(substance, key, value)
-
+        substance.save()
         return {
             "id": substance.id,
             "name": substance.name,

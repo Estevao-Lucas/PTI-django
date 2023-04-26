@@ -1,6 +1,7 @@
 from core.models import Symptom, Patient, Substance
 from django.db import transaction
 from core.domain.abstract_repositories import ABCRepository
+from django.db.models.functions import Coalesce
 
 
 class PatientRepository(ABCRepository):
@@ -20,14 +21,13 @@ class PatientRepository(ABCRepository):
                     "name": symptom.name,
                     "nature": symptom.nature,
                     "weight": symptom.weight,
-                    "sub_category": [
-                        {
-                            "id": sub_category.get("id"),
-                            "name": sub_category.get("name"),
-                            "description": sub_category.get("description"),
-                        }
-                        for sub_category in symptom.sub_category.all().values()
-                    ],
+                    "sub_category": {
+                        "id": symptom.sub_category.id,
+                        "name": symptom.sub_category.name,
+                        "description": symptom.sub_category.description,
+                    }
+                    if symptom.sub_category
+                    else None,
                 }
                 for symptom in patient.symptoms.all()
             ],
@@ -43,9 +43,9 @@ class PatientRepository(ABCRepository):
                 "name": substance.name,
                 "traeted_symptoms": list(
                     set(
-                        symptoms.filter(substance=substance).values_list(
-                            "name", flat=True
-                        )
+                        symptoms.filter(substance=substance)
+                        .annotate(category_name=Coalesce("sub_category__name", "name"))
+                        .values_list("category_name", flat=True)
                     )
                 ),
                 "total_punctuation": sum(
@@ -67,6 +67,7 @@ class PatientRepository(ABCRepository):
                 patient.symptoms.add(Symptom.objects.get(id=symptom["id"]))
         for key, value in data.items():
             setattr(patient, key, value)
+        patient.save()
 
         return {
             "id": patient.id,
@@ -79,14 +80,13 @@ class PatientRepository(ABCRepository):
                     "name": symptom.name,
                     "nature": symptom.nature,
                     "weight": symptom.weight,
-                    "sub_category": [
-                        {
-                            "id": sub_category.id,
-                            "name": sub_category.name,
-                            "description": sub_category.description,
-                        }
-                        for sub_category in symptom.sub_category.all()
-                    ],
+                    "sub_category": {
+                        "id": symptom.sub_category.id,
+                        "name": symptom.sub_category.name,
+                        "description": symptom.sub_category.description,
+                    }
+                    if symptom.sub_category
+                    else None,
                 }
                 for symptom in patient.symptoms.all()
             ],
