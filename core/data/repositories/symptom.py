@@ -1,35 +1,36 @@
 from core.models import Symptom, Substance, SubCategory
 from django.db import transaction
 from core.domain.abstract_repositories import ABCRepository
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class SymptomRepository(ABCRepository):
-    def _get_substance_or_subcategory(self, data, symptom, is_update=None):
+    def _get_substance_or_subcategory(self, data, symptom: Symptom, is_update=None):
         for key, value in data.items():
             if key == "sub_category":
-                for sub_category in value:
-                    _sub_category = SubCategory.objects.get_or_create(
-                        id=sub_category["id"],
+                id = data[key].get("id", None)
+                if id:
+                    sub_category, _ = SubCategory.objects.update_or_create(
+                        id=id,
                         defaults={
-                            "name": sub_category.get("name", ""),
-                            "description": sub_category.get("description", ""),
+                            "name": data[key].get("name", ""),
+                            "description": data[key].get("description", ""),
                         },
                     )
-                    symptom.sub_category.add(_sub_category[0])
+                    symptom.sub_category = sub_category
             elif key == "substances":
                 for substance in value:
-                    _substance = Substance.objects.get_or_create(
+                    _substance, _ = Substance.objects.update_or_create(
                         id=substance["id"],
                         defaults={
-                            "name": substance["name"],
-                            "abbreviation": substance["abbreviation"],
+                            "name": substance.get("name", ""),
+                            "abbreviation": substance.get("abbreviation", ""),
                         },
                     )
-                    symptom.substance.add(_substance[0])
+                    symptom.substance.add(_substance)
             else:
                 if is_update:
-                    for key, value in data.items():
-                        setattr(symptom, key, value)
+                    setattr(symptom, key, value)
 
     def get(self, id):
         symptom = Symptom.objects.get(id=id)
@@ -72,7 +73,7 @@ class SymptomRepository(ABCRepository):
         )
 
         self._get_substance_or_subcategory(data, symptom)
-
+        symptom.save()
         return {"message": "Symptom created successfully"}
 
     @transaction.atomic
@@ -80,7 +81,7 @@ class SymptomRepository(ABCRepository):
         try:
             id = data["id"]
             symptom = Symptom.objects.get(id=id)
-        except:
+        except ObjectDoesNotExist:
             return {"message": "Symptom not found"}
         else:
             self._get_substance_or_subcategory(data, symptom, is_update=True)
@@ -95,7 +96,9 @@ class SymptomRepository(ABCRepository):
                     "id": symptom.sub_category.id,
                     "name": symptom.sub_category.name,
                     "description": symptom.sub_category.description,
-                },
+                }
+                if symptom.sub_category
+                else None,
                 "weight": symptom.weight,
                 "substances": [
                     {
