@@ -62,12 +62,12 @@ class PatientRepository(ABCRepository):
     @transaction.atomic
     def update(self, data):
         patient = Patient.objects.get(id=data["id"])
-        symptoms = data.pop("symptoms", None)
-        if symptoms:
-            for symptom in symptoms:
-                patient.symptoms.add(Symptom.objects.get(id=symptom["id"]))
+        new_symptoms = data.get("symptoms")
+        if new_symptoms:
+            patient.symptoms.set([symptom["id"] for symptom in new_symptoms])
         for key, value in data.items():
-            setattr(patient, key, value)
+            if key != "symptoms":
+                setattr(patient, key, value)
         patient.save()
 
         return {
