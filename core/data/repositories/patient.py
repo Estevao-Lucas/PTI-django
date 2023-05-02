@@ -110,4 +110,26 @@ class PatientRepository(ABCRepository):
             for symptom in symptoms:
                 patient.symptoms.add(Symptom.objects.get(id=symptom["id"]))
 
-        return {"message": "Patient created successfully"}
+        return {
+            "id": patient.id,
+            "name": patient.name,
+            "mothers_name": patient.mothers_name,
+            "birth_date": patient.birth_date,
+            "symptoms": [
+                {
+                    "id": symptom.id,
+                    "name": symptom.name,
+                    "nature": symptom.nature,
+                    "weight": symptom.weight,
+                    "sub_category": {
+                        "id": symptom.sub_category.id,
+                        "name": symptom.sub_category.name,
+                        "description": symptom.sub_category.description,
+                    }
+                    if symptom.sub_category
+                    else None,
+                }
+                for symptom in patient.symptoms.all()
+            ],
+            "substance_punctuation": self._get_punctuation(patient),
+        }
