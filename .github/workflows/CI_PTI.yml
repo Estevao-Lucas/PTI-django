@@ -24,10 +24,10 @@ jobs:
         echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> .env
             
     - name: Build docker image
-      run: docker-compose build
+      run: docker compose build
     
     - name: Up containers
-      run: docker-compose up -d
+      run: docker compose up -d
       
     - name: Teste
       run: docker exec -i ptii_web pytest -v
